@@ -35,6 +35,7 @@ async function bootstrap() {
 
   await app.listen(process.env.PORT ?? 3000);
 }
+
 bootstrap().catch((error: unknown) => {
   const logger = new Logger('Bootstrap');
 
@@ -43,4 +44,6 @@ bootstrap().catch((error: unknown) => {
   } else {
     logger.error(`Application bootstrap failed (${String(error)})`);
   }
+
+  process.exitCode = 1;
 });
