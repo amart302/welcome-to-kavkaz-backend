@@ -61,7 +61,7 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('Пожалуйста, авторизуйтесь');
     }
 
-    req.user = { sub: decoded.sub };
+    req.user = { sub: decoded.sub, role: decoded.role };
 
     return true;
   }
