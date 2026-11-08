@@ -2,8 +2,8 @@ import { DocumentBuilder } from '@nestjs/swagger';
 
 export function createSwaggerConfig() {
   return new DocumentBuilder()
-    .setTitle('Nest Template API')
-    .setDescription('API for Nest Template')
+    .setTitle('Welcome to Kavkazz Backend')
+    .setDescription('API for Welcome to Kavkazz')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

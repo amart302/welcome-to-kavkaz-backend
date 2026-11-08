@@ -2,11 +2,15 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 
-import type { AuthUser } from '@/common/types/auth-user.types';
+import type {
+  AccessTokenPayload,
+  AuthUser,
+} from '@/common/types/auth-user.types';
+import type { ServiceDataResponse } from '@/common/types/service-response.types';
 import { PrismaService } from '@/prisma/prisma.service';
 
 import { LoginDto } from './dto/login.dto';
-import { AuthWithTokenResponse } from './types/auth.types';
+import type { AuthToken, CurrentUserData } from './types/auth.types';
 
 @Injectable()
 export class AuthService {
@@ -17,11 +21,13 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  private async generateAccessToken(authUser: AuthUser): Promise<string> {
-    return this.jwtService.signAsync(authUser);
+  private async generateAccessToken(
+    payload: AccessTokenPayload,
+  ): Promise<string> {
+    return this.jwtService.signAsync(payload);
   }
 
-  async login(dto: LoginDto): Promise<AuthWithTokenResponse> {
+  async login(dto: LoginDto): Promise<ServiceDataResponse<AuthToken>> {
     this.logger.log('Login started');
 
     const { email, password } = dto;
@@ -30,13 +36,19 @@ export class AuthService {
       where: { email: email.toLowerCase() },
       select: {
         id: true,
-        role: true,
         passwordHash: true,
+        isActive: true,
       },
     });
 
     if (!user) {
       this.logger.warn('Login failed: user not found');
+
+      throw new UnauthorizedException('Неверный email или пароль');
+    }
+
+    if (!user.isActive) {
+      this.logger.warn(`Login failed: user inactive (userId=${user.id})`);
 
       throw new UnauthorizedException('Неверный email или пароль');
     }
@@ -49,16 +61,26 @@ export class AuthService {
       throw new UnauthorizedException('Неверный email или пароль');
     }
 
-    const accessToken = await this.generateAccessToken({
-      sub: user.id,
-      role: user.role,
-    });
+    const accessToken = await this.generateAccessToken({ sub: user.id });
 
     this.logger.log(`Login completed successfully (userId=${user.id})`);
 
     return {
       message: 'Вход в систему выполнен успешно',
       data: { accessToken },
+    };
+  }
+
+  getMe(authUser: AuthUser): ServiceDataResponse<CurrentUserData> {
+    this.logger.log('Get user started');
+
+    const { sub, role } = authUser;
+
+    this.logger.log(`Get user completed successfully (userId=${sub})`);
+
+    return {
+      message: 'Данные пользователя получены',
+      data: { id: sub, role },
     };
   }
 }
