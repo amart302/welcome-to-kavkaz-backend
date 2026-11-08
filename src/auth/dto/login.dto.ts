@@ -13,7 +13,7 @@ import { normalizeString } from '@/common/transformers/normalize-string.transfor
 export class LoginDto {
   @ApiProperty({
     example: 'admin@example.com',
-    description: 'Email администратора',
+    description: 'Email пользователя',
     format: 'email',
     maxLength: 255,
   })
@@ -25,7 +25,7 @@ export class LoginDto {
   email!: string;
 
   @ApiProperty({
-    description: 'Пароль администратора',
+    description: 'Пароль пользователя',
     format: 'password',
     minLength: 1,
     writeOnly: true,
