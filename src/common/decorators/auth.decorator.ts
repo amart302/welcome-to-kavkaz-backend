@@ -8,7 +8,8 @@ export function Auth(): ReturnType<typeof applyDecorators> {
     UseGuards(AuthGuard),
     ApiBearerAuth(),
     ApiUnauthorizedResponse({
-      description: 'Пользователь не авторизован',
+      description:
+        'Bearer-токен отсутствует, некорректен или просрочен; данные токена некорректны; пользователь не найден или учетная запись деактивирована',
       schema: {
         example: {
           success: false,

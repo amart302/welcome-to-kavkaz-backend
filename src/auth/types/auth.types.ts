@@ -1,5 +1,10 @@
-import { ServiceDataResponse } from '@/common/types/service-response.types';
+import type { Role } from '@/generated/prisma/enums';
 
-export type AuthWithTokenResponse = ServiceDataResponse<{
+export interface AuthToken {
   accessToken: string;
-}>;
+}
+
+export interface CurrentUserData {
+  id: string;
+  role: Role;
+}
