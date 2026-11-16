@@ -1,13 +1,8 @@
 export function normalizeNumber({ value }: { value: unknown }): unknown {
-  if (value === undefined || value === null) {
+  if (typeof value !== 'string') {
     return value;
   }
 
-  if (typeof value === 'string') {
-    const normalizedValue = value.trim();
-
-    return normalizedValue ? Number(normalizedValue) : null;
-  }
-
-  return value;
+  const trimmed = value.trim();
+  return trimmed === '' ? trimmed : Number(trimmed);
 }

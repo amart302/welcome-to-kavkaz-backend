@@ -18,10 +18,7 @@ async function bootstrap() {
   app.enableShutdownHooks();
 
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      configService.get<string>('FRONTEND_URL'),
-    ].filter((item): item is string => Boolean(item)),
+    origin: configService.getOrThrow<string>('FRONTEND_URL'),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
   });
