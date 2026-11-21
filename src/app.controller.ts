@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Version, VERSION_NEUTRAL } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import type { ServiceMessageResponse } from '@/common/types/service-response.types';
@@ -11,6 +11,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('health')
+  @Version(VERSION_NEUTRAL)
   @ApiOperation({ summary: 'Проверка доступности API' })
   @ApiOkResponse({
     description: 'API доступен. Подключение к базе данных не проверяется.',
