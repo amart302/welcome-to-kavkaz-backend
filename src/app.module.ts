@@ -10,6 +10,7 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { ImagesModule } from './images/images.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AuthModule } from './auth/auth.module';
     JwtAuthModule,
     PrismaModule,
     AuthModule,
+    ImagesModule,
   ],
   controllers: [AppController],
   providers: [

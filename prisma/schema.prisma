@@ -26,3 +26,19 @@ model User {
 
   @@map("users")
 }
+
+model Image {
+  id String @id @default(uuid()) @db.Uuid
+
+  path         String @unique @db.VarChar(500)
+  originalName String @db.VarChar(255)
+  mimeType     String @db.VarChar(100)
+
+  sizeBytes Int
+
+  position Int     @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@map("images")
+}
