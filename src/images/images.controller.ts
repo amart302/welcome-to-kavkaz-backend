@@ -11,35 +11,24 @@ import {
   ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
-  ApiInternalServerErrorResponse,
   ApiOperation,
   ApiPayloadTooLargeResponse,
   ApiTags,
-  ApiTooManyRequestsResponse,
-  ApiUnsupportedMediaTypeResponse,
 } from '@nestjs/swagger';
 
 import { Auth } from '@/common/decorators/auth.decorator';
 import { FileUploadInterceptor } from '@/common/interceptors/file-upload.interceptor';
+import { ServiceDataResponse } from '@/common/types/service-response.types';
 
 import { imageExample } from './docs/images.examples';
 import { ImagesService } from './images.service';
+import { ImageResponse } from './types/image.types';
 
 const imageMimeTypes = ['image/jpeg', 'image/png', 'image/webp'] as const;
 const fileRequiredMessage = 'Файл не был загружен';
 
 @Controller('images')
 @ApiTags('Images')
-@ApiInternalServerErrorResponse({
-  description: 'Внутренняя ошибка сервера',
-  schema: {
-    example: {
-      success: false,
-      statusCode: 500,
-      message: 'Внутренняя ошибка сервера',
-    },
-  },
-})
 export class ImagesController {
   constructor(private readonly imagesService: ImagesService) {}
 
@@ -75,26 +64,11 @@ export class ImagesController {
   @ApiBadRequestResponse({
     description:
       'Файл отсутствует, имеет недопустимый тип или запрос повреждён',
-    content: {
-      'application/json': {
-        examples: {
-          fileRequired: {
-            summary: 'Файл отсутствует',
-            value: {
-              success: false,
-              statusCode: 400,
-              message: fileRequiredMessage,
-            },
-          },
-          invalidFormat: {
-            summary: 'Недопустимый MIME-тип файла',
-            value: {
-              success: false,
-              statusCode: 400,
-              message: `Разрешены только типы: ${imageMimeTypes.join(', ')}`,
-            },
-          },
-        },
+    schema: {
+      example: {
+        success: false,
+        statusCode: 400,
+        message: fileRequiredMessage,
       },
     },
   })
@@ -108,26 +82,6 @@ export class ImagesController {
       },
     },
   })
-  @ApiUnsupportedMediaTypeResponse({
-    description: 'Неподдерживаемый тип multipart-запроса',
-    schema: {
-      example: {
-        success: false,
-        statusCode: 415,
-        message: 'Unsupported content type',
-      },
-    },
-  })
-  @ApiTooManyRequestsResponse({
-    description: 'Превышен лимит запросов',
-    schema: {
-      example: {
-        success: false,
-        statusCode: 429,
-        message: 'ThrottlerException: Too Many Requests',
-      },
-    },
-  })
   upload(
     @UploadedFile(
       new ParseFilePipe({
@@ -136,7 +90,7 @@ export class ImagesController {
       }),
     )
     file: Express.Multer.File,
-  ) {
+  ): Promise<ServiceDataResponse<ImageResponse>> {
     return this.imagesService.upload(file);
   }
 }

@@ -8,7 +8,6 @@ import {
 } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiInternalServerErrorResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -27,16 +26,6 @@ import type { AuthToken, CurrentUserData } from './types/auth.types';
 
 @Controller('auth')
 @ApiTags('Auth')
-@ApiInternalServerErrorResponse({
-  description: 'Внутренняя ошибка сервера',
-  schema: {
-    example: {
-      success: false,
-      statusCode: 500,
-      message: 'Внутренняя ошибка сервера',
-    },
-  },
-})
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
