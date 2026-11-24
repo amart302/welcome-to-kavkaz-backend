@@ -27,8 +27,57 @@ model User {
   @@map("users")
 }
 
+model Tour {
+  id String @id @default(uuid()) @db.Uuid
+
+  title            String @db.VarChar(255)
+  slug             String @unique @db.VarChar(255)
+  shortDescription String @db.Text
+  description      String @db.Text
+
+  price           Int
+  durationDays    Int
+  durationHours   Int?
+  location        String @db.VarChar(255)
+  meetingPoint    String @db.Text
+  maxParticipants Int?
+
+  included      String[] @default([])
+  notIncluded   String[] @default([])
+  whatToBring   String[] @default([])
+  importantInfo String?  @db.Text
+
+  days   TourDay[]
+  images Image[]
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("tours")
+}
+
+model TourDay {
+  id String @id @default(uuid()) @db.Uuid
+
+  tourId String @db.Uuid
+  tour   Tour   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  dayNumber   Int
+  title       String  @db.VarChar(255)
+  description String  @db.Text
+  overnight   String? @db.VarChar(255)
+
+  @@unique([tourId, dayNumber])
+  @@map("tour_days")
+}
+
 model Image {
   id String @id @default(uuid()) @db.Uuid
+
+  tourId String? @db.Uuid
+  tour   Tour?   @relation(fields: [tourId], references: [id], onDelete: Cascade)
 
   path         String @unique @db.VarChar(500)
   originalName String @db.VarChar(255)
@@ -36,9 +85,10 @@ model Image {
 
   sizeBytes Int
 
-  position Int     @default(0)
+  position Int @default(0)
 
   createdAt DateTime @default(now())
 
+  @@index([tourId, position])
   @@map("images")
 }

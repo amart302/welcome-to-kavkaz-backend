@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 import { envValidationSchema } from '@/common/config/env.validation';
@@ -18,6 +19,8 @@ import { ImagesModule } from './images/images.module';
       isGlobal: true,
       validationSchema: envValidationSchema,
     }),
+
+    ScheduleModule.forRoot(),
 
     ThrottlerModule.forRoot({
       throttlers: [{ ttl: 60_000, limit: 100 }],
