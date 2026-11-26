@@ -1,11 +1,20 @@
 import { applyDecorators, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
+import { AdminGuard } from '../guards/admin.guard';
 import { AuthGuard } from '../guards/auth.guard';
 
-export function Auth(): ReturnType<typeof applyDecorators> {
+export function Auth({
+  adminOnly = false,
+}: {
+  adminOnly?: boolean;
+} = {}): ReturnType<typeof applyDecorators> {
   return applyDecorators(
-    UseGuards(AuthGuard),
+    UseGuards(...(adminOnly ? [AuthGuard, AdminGuard] : [AuthGuard])),
     ApiBearerAuth(),
     ApiUnauthorizedResponse({
       description:
@@ -18,5 +27,19 @@ export function Auth(): ReturnType<typeof applyDecorators> {
         },
       },
     }),
+    ...(adminOnly
+      ? [
+          ApiForbiddenResponse({
+            description: 'Доступ разрешён только администраторам',
+            schema: {
+              example: {
+                success: false,
+                statusCode: 403,
+                message: 'Доступ разрешён только администраторам',
+              },
+            },
+          }),
+        ]
+      : []),
   );
 }
