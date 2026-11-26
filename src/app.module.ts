@@ -12,6 +12,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ImagesModule } from './images/images.module';
+import { ToursModule } from './tours/tours.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ImagesModule } from './images/images.module';
     PrismaModule,
     AuthModule,
     ImagesModule,
+    ToursModule,
   ],
   controllers: [AppController],
   providers: [
