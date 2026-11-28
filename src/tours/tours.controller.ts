@@ -11,12 +11,16 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '@/common/decorators/auth.decorator';
-import { ServiceDataResponse } from '@/common/types/service-response.types';
+import {
+  ServiceDataResponse,
+  ServiceMessageResponse,
+} from '@/common/types/service-response.types';
 
 import {
   ApiCreateTour,
   ApiFindTourById,
   ApiFindTourByIdForAdmin,
+  ApiRemoveTour,
 } from './docs/tours.swagger';
 import { CreateTourDto } from './dto/create-tour.dto';
 import { UpdateTourDto } from './dto/update-tour.dto';
@@ -44,24 +48,32 @@ export class ToursController {
 
   @Get(':id')
   @ApiFindTourById()
-  findById(@Param('id', ParseUUIDPipe) id: string) {
+  findById(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ServiceDataResponse<TourDetailsResponse>> {
     return this.toursService.findById(id);
   }
 
   @Get('admin/:id')
   @Auth({ adminOnly: true })
   @ApiFindTourByIdForAdmin()
-  findByIdForAdmin(@Param('id', ParseUUIDPipe) id: string) {
+  findByIdForAdmin(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ServiceDataResponse<TourDetailsResponse>> {
     return this.toursService.findByIdForAdmin(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() dto: UpdateTourDto) {
-    return this.toursService.update(+id, dto);
+  update(@Param('id', ParseUUIDPipe) id: string, @Body() dto: UpdateTourDto) {
+    return this.toursService.update(id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.toursService.remove(+id);
+  @Auth({ adminOnly: true })
+  @ApiRemoveTour()
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<ServiceMessageResponse> {
+    return this.toursService.remove(id);
   }
 }

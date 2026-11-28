@@ -6,7 +6,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { ServiceDataResponse } from '@/common/types/service-response.types';
+import {
+  ServiceDataResponse,
+  ServiceMessageResponse,
+} from '@/common/types/service-response.types';
 import { Prisma } from '@/generated/prisma/client';
 import { PrismaService } from '@/prisma/prisma.service';
 
@@ -122,7 +125,9 @@ export class ToursService {
     return `This action returns all tours`;
   }
 
-  async findById(id: string) {
+  async findById(
+    id: string,
+  ): Promise<ServiceDataResponse<TourDetailsResponse>> {
     this.logger.log(`Tour retrieval started (tourId=${id})`);
 
     const tour = await this.getTourOrThrow({ id, isActive: true });
@@ -137,7 +142,9 @@ export class ToursService {
     };
   }
 
-  async findByIdForAdmin(id: string) {
+  async findByIdForAdmin(
+    id: string,
+  ): Promise<ServiceDataResponse<TourDetailsResponse>> {
     this.logger.log(`Admin tour retrieval started (tourId=${id})`);
 
     const tour = await this.getTourOrThrow({ id });
@@ -152,12 +159,32 @@ export class ToursService {
     };
   }
 
-  update(id: number, dto: UpdateTourDto) {
+  update(id: string, dto: UpdateTourDto) {
     void dto;
     return `This action updates a #${id} tour`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tour`;
+  async remove(id: string): Promise<ServiceMessageResponse> {
+    this.logger.log(`Tour deletion started (tourId=${id})`);
+
+    await this.prismaService.tour
+      .delete({ where: { id } })
+      .catch((error: unknown) => {
+        if (
+          error instanceof Prisma.PrismaClientKnownRequestError &&
+          error.code === 'P2025'
+        ) {
+          this.logger.warn(
+            `Tour deletion failed: tour not found (tourId=${id})`,
+          );
+          throw new NotFoundException('Тур не найден');
+        }
+
+        throw error;
+      });
+
+    this.logger.log(`Tour deletion completed successfully (tourId=${id})`);
+
+    return { message: 'Тур успешно удалён' };
   }
 }

@@ -162,3 +162,47 @@ export function ApiFindTourByIdForAdmin(): ReturnType<typeof applyDecorators> {
     }),
   );
 }
+
+export function ApiRemoveTour(): ReturnType<typeof applyDecorators> {
+  return applyDecorators(
+    ApiOperation({ summary: 'Удаление тура по ID' }),
+    ApiParam({
+      name: 'id',
+      description: 'Идентификатор тура',
+      schema: {
+        type: 'string',
+        format: 'uuid',
+        example: tourDetailsExample.id,
+      },
+    }),
+    ApiOkResponse({
+      description: 'Тур успешно удалён',
+      schema: {
+        example: {
+          success: true,
+          message: 'Тур успешно удалён',
+        },
+      },
+    }),
+    ApiBadRequestResponse({
+      description: 'Некорректный UUID тура',
+      schema: {
+        example: {
+          success: false,
+          statusCode: 400,
+          message: 'Validation failed (uuid is expected)',
+        },
+      },
+    }),
+    ApiNotFoundResponse({
+      description: 'Тур не найден',
+      schema: {
+        example: {
+          success: false,
+          statusCode: 404,
+          message: 'Тур не найден',
+        },
+      },
+    }),
+  );
+}
