@@ -3,6 +3,7 @@ import {
   ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 
 import { ServiceDataResponse } from '@/common/types/service-response.types';
@@ -19,6 +20,25 @@ export class ToursService {
   private readonly logger = new Logger(ToursService.name);
 
   constructor(private readonly prismaService: PrismaService) {}
+
+  private async getTourOrThrow(
+    where: Prisma.TourWhereUniqueInput,
+  ): Promise<TourDetailsResponse> {
+    const tour = await this.prismaService.tour.findUnique({
+      where,
+      select: tourDetailsSelect,
+    });
+
+    if (!tour) {
+      this.logger.warn(
+        `Tour retrieval failed: tour not found (tourId=${where.id})`,
+      );
+
+      throw new NotFoundException('Тур не найден');
+    }
+
+    return tour;
+  }
 
   async create(
     dto: CreateTourDto,
@@ -102,8 +122,34 @@ export class ToursService {
     return `This action returns all tours`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} tour`;
+  async findById(id: string) {
+    this.logger.log(`Tour retrieval started (tourId=${id})`);
+
+    const tour = await this.getTourOrThrow({ id, isActive: true });
+
+    this.logger.log(
+      `Tour retrieval completed successfully (tourId=${tour.id})`,
+    );
+
+    return {
+      message: 'Тур успешно получен',
+      data: tour,
+    };
+  }
+
+  async findByIdForAdmin(id: string) {
+    this.logger.log(`Admin tour retrieval started (tourId=${id})`);
+
+    const tour = await this.getTourOrThrow({ id });
+
+    this.logger.log(
+      `Admin tour retrieval completed successfully (tourId=${tour.id})`,
+    );
+
+    return {
+      message: 'Тур успешно получен',
+      data: tour,
+    };
   }
 
   update(id: number, dto: UpdateTourDto) {

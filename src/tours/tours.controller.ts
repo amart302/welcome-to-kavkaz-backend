@@ -4,21 +4,20 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
 } from '@nestjs/common';
-import {
-  ApiBadRequestResponse,
-  ApiConflictResponse,
-  ApiCreatedResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
 import { Auth } from '@/common/decorators/auth.decorator';
 import { ServiceDataResponse } from '@/common/types/service-response.types';
 
-import { tourDetailsExample } from './docs/tours.examples';
+import {
+  ApiCreateTour,
+  ApiFindTourById,
+  ApiFindTourByIdForAdmin,
+} from './docs/tours.swagger';
 import { CreateTourDto } from './dto/create-tour.dto';
 import { UpdateTourDto } from './dto/update-tour.dto';
 import { ToursService } from './tours.service';
@@ -31,57 +30,7 @@ export class ToursController {
 
   @Post()
   @Auth({ adminOnly: true })
-  @ApiOperation({ summary: 'Создание тура' })
-  @ApiCreatedResponse({
-    description: 'Тур успешно создан',
-    schema: {
-      example: {
-        success: true,
-        message: 'Тур успешно создан',
-        data: tourDetailsExample,
-      },
-    },
-  })
-  @ApiBadRequestResponse({
-    description:
-      'Ошибка валидации, номер дня превышает длительность тура или изображение недоступно для привязки',
-    examples: {
-      validation: {
-        summary: 'Ошибка валидации входных данных',
-        value: {
-          success: false,
-          statusCode: 400,
-          message: ['Название тура обязательно'],
-        },
-      },
-      dayBeyondDuration: {
-        summary: 'Номер дня превышает длительность тура',
-        value: {
-          success: false,
-          statusCode: 400,
-          message: 'Номер дня программы не может превышать длительность тура',
-        },
-      },
-      imageUnavailable: {
-        summary: 'Изображение недоступно для привязки',
-        value: {
-          success: false,
-          statusCode: 400,
-          message: 'Изображение не найдено или уже привязано к туру',
-        },
-      },
-    },
-  })
-  @ApiConflictResponse({
-    description: 'Тур с таким slug уже существует',
-    schema: {
-      example: {
-        success: false,
-        statusCode: 409,
-        message: 'Тур с таким slug уже существует',
-      },
-    },
-  })
+  @ApiCreateTour()
   create(
     @Body() dto: CreateTourDto,
   ): Promise<ServiceDataResponse<TourDetailsResponse>> {
@@ -94,8 +43,16 @@ export class ToursController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.toursService.findOne(+id);
+  @ApiFindTourById()
+  findById(@Param('id', ParseUUIDPipe) id: string) {
+    return this.toursService.findById(id);
+  }
+
+  @Get('admin/:id')
+  @Auth({ adminOnly: true })
+  @ApiFindTourByIdForAdmin()
+  findByIdForAdmin(@Param('id', ParseUUIDPipe) id: string) {
+    return this.toursService.findByIdForAdmin(id);
   }
 
   @Patch(':id')

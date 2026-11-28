@@ -16,7 +16,7 @@ import {
   fileRequiredMessage,
   imageMimeTypes,
 } from './constants/images.constants';
-import { ApiUpload } from './docs/images.swagger';
+import { ApiUploadImage } from './docs/images.swagger';
 import { ImagesService } from './images.service';
 import { ImageResponse } from './types/image.types';
 
@@ -28,7 +28,7 @@ export class ImagesController {
   @Post('upload')
   @Auth()
   @UseInterceptors(FileUploadInterceptor([...imageMimeTypes]))
-  @ApiUpload()
+  @ApiUploadImage()
   upload(
     @UploadedFile(
       new ParseFilePipe({

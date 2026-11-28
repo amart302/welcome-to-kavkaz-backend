@@ -38,3 +38,8 @@ export const tourDetailsExample = {
     },
   ],
 };
+
+export const inactiveTourDetailsExample = {
+  ...tourDetailsExample,
+  isActive: false,
+};

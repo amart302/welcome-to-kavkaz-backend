@@ -8,7 +8,7 @@ import {
 
 import { authTokenExample, currentUserExample } from './auth.examples';
 
-export function ApiLogin(): ReturnType<typeof applyDecorators> {
+export function ApiLoginUser(): ReturnType<typeof applyDecorators> {
   return applyDecorators(
     ApiOperation({ summary: 'Авторизация пользователя' }),
     ApiOkResponse({
@@ -45,7 +45,7 @@ export function ApiLogin(): ReturnType<typeof applyDecorators> {
   );
 }
 
-export function ApiGetMe(): ReturnType<typeof applyDecorators> {
+export function ApiGetCurrentUser(): ReturnType<typeof applyDecorators> {
   return applyDecorators(
     ApiOperation({ summary: 'Получение данных пользователя' }),
     ApiOkResponse({

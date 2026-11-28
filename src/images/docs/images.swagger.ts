@@ -14,7 +14,7 @@ import {
 } from '../constants/images.constants';
 import { imageExample } from './images.examples';
 
-export function ApiUpload(): ReturnType<typeof applyDecorators> {
+export function ApiUploadImage(): ReturnType<typeof applyDecorators> {
   return applyDecorators(
     ApiOperation({ summary: 'Загрузка изображения' }),
     ApiConsumes('multipart/form-data'),

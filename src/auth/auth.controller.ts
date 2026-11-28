@@ -14,7 +14,7 @@ import type { AuthUser } from '@/common/types/auth-user.types';
 import type { ServiceDataResponse } from '@/common/types/service-response.types';
 
 import { AuthService } from './auth.service';
-import { ApiGetMe, ApiLogin } from './docs/auth.swagger';
+import { ApiGetCurrentUser, ApiLoginUser } from './docs/auth.swagger';
 import { LoginDto } from './dto/login.dto';
 import type { AuthToken, CurrentUserData } from './types/auth.types';
 
@@ -25,14 +25,14 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  @ApiLogin()
+  @ApiLoginUser()
   login(@Body() dto: LoginDto): Promise<ServiceDataResponse<AuthToken>> {
     return this.authService.login(dto);
   }
 
   @Get('me')
   @Auth()
-  @ApiGetMe()
+  @ApiGetCurrentUser()
   getMe(
     @CurrentUser() authUser: AuthUser,
   ): ServiceDataResponse<CurrentUserData> {
